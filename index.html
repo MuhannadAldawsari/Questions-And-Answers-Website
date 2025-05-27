@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DevOverflow - Q&A for Developers</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="container">
+    <nav>
+      <a href="#" class="logo" id="home-link">
+        <span class="logo-icon">D</span>
+        <span>DevOverflow</span>
+      </a>
+      <div class="search-container">
+        <span class="search-icon" >🔍</span>
+        <label>
+          <input type="text" id="search-input" placeholder="Search..."></label>
+      </div>
+      <button id="search-btn" class="btn-secondary">Search</button>
+      <div id="auth-links">
+        <button class="btn-secondary" id="login-btn">Log in</button>
+        <button id="register-btn">Sign up</button>
+      </div>
+      <div id="user-links" style="display: none;">
+        <span id="username-display"></span>
+        <button class="btn btn-primary" id="ask-question-btn">Ask Question</button>
+        <button class="btn-secondary" id="logout-btn">Log out</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <div class="main-content">
+    <div class="sidebar">
+      <ul>
+        <li><a href="#" class="sidebar-link active" id="questions-link">Questions</a></li>
+        <li><a href="#" class="sidebar-link" id="my-questions-link">My Questions</a></li>
+        <li><a href="#" class="sidebar-link" id="my-answers-link">My Answers</a></li>
+      </ul>
+    </div>
+    <div class="content">
+      <!-- Home/Questions section -->
+      <section id="home-section">
+        <div class="page-title">
+          <h1>All Questions</h1>
+          <button class="btn" id="home-ask-btn">Ask Question</button>
+        </div>
+        <div id="questions-list"></div>
+      </section>
+
+      <!-- Question detail section -->
+      <section id="question-detail-section" style="display: none;">
+        <div id="question-detail"></div>
+        <div id="answers-container"></div>
+        <div id="answer-form-container"></div>
+      </section>
+
+      <!-- My Questions section -->
+      <section id="my-questions-section" style="display: none;">
+        <div class="page-title">
+          <h1>My Questions</h1>
+          <button class="btn" id="my-questions-ask-btn">Ask Question</button>
+        </div>
+        <div id="my-questions-list"></div>
+      </section>
+
+      <!-- My Answers section -->
+      <section id="my-answers-section" style="display: none;">
+        <div class="page-title">
+          <h1>My Answers</h1>
+        </div>
+        <div id="my-answers-list"></div>
+      </section>
+
+      <!-- Ask Question section -->
+      <section id="ask-question-section" style="display: none;">
+        <h1 id="question-form-title">Ask a Question</h1>
+        <form id="question-form">
+          <div class="form-group">
+            <label for="question-title">Title</label>
+            <input type="text" id="question-title" required placeholder="What's your programming question? Be specific.">
+          </div>
+          <div class="form-group">
+            <label for="question-body">Body</label>
+            <textarea id="question-body" rows="10" required placeholder="Include all the information someone would need to answer your question"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="question-tags">Tags</label>
+            <input type="text" id="question-tags" placeholder="Add up to 5 tags (e.g., javascript, react, node.js)">
+          </div>
+          <input type="hidden" id="question-id">
+          <button type="submit" class="btn">Post Your Question</button>
+          <button type="button" class="btn-secondary" id="cancel-question-btn">Cancel</button>
+        </form>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal-backdrop" id="login-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Log in</h2>
+    </div>
+    <form id="login-form">
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" required>
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" required>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn">Log in</button>
+        <button type="button" class="btn-secondary" id="switch-to-register">Need an account? Sign up</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Register Modal -->
+<div class="modal-backdrop" id="register-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Sign up</h2>
+    </div>
+    <form id="register-form">
+      <div class="form-group">
+        <label for="register-name">Display Name</label>
+        <input type="text" id="register-name" required>
+      </div>
+      <div class="form-group">
+        <label for="register-email">Email</label>
+        <input type="email" id="register-email" required>
+      </div>
+      <div class="form-group">
+        <label for="register-password">Password</label>
+        <input type="password" id="register-password" required minlength="8">
+        <small>Password must be at least 8 characters</small>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn">Sign up</button>
+        <button type="button" class="btn-secondary" id="switch-to-login">Already have an account? Log in</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Answer Modal -->
+<div class="modal-backdrop" id="edit-answer-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Edit Answer</h2>
+    </div>
+    <form id="edit-answer-form">
+      <div class="form-group">
+        <label for="edit-answer-body">Answer</label>
+        <textarea id="edit-answer-body" rows="10" required></textarea>
+      </div>
+      <input type="hidden" id="edit-answer-id">
+      <input type="hidden" id="edit-answer-question-id">
+      <div class="form-actions">
+        <button type="submit" class="btn">Update Answer</button>
+        <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Comment Modal -->
+<div class="modal-backdrop" id="add-comment-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Add Comment</h2>
+      <button class="modal-close" id="close-add-comment-modal">×</button>
+    </div>
+    <form id="add-comment-form">
+      <div class="form-group">
+        <label for="comment-body">Comment</label>
+        <textarea id="comment-body" rows="3" required maxlength="500" placeholder="Use comments to reply to other users or notify them of changes."></textarea>
+        <small><span id="comment-chars-left">500</span> characters remaining</small>
+      </div>
+      <input type="hidden" id="comment-id">
+      <input type="hidden" id="comment-parent-id">
+      <input type="hidden" id="comment-parent-type">
+      <div class="form-actions">
+        <button type="submit" class="btn">Add Comment</button>
+        <button type="button" class="btn-secondary" id="cancel-add-comment">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Main script for authentication functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    // DOM elements
+    const authLinks = document.getElementById('auth-links');
+    const userLinks = document.getElementById('user-links');
+    const usernameDisplay = document.getElementById('username-display');
+    const loginBtn = document.getElementById('login-btn');
+    const registerBtn = document.getElementById('register-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const loginModal = document.getElementById('login-modal');
+    const registerModal = document.getElementById('register-modal');
+    const switchToRegister = document.getElementById('switch-to-register');
+    const switchToLogin = document.getElementById('switch-to-login');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const myQuestionsLink = document.getElementById('my-questions-link');
+    const myAnswersLink = document.getElementById('my-answers-link');
+
+    // Check if user is logged in on page load
+    checkLoginStatus();
+
+    // Event listeners for showing/hiding modals
+    loginBtn.addEventListener('click', () => {
+      loginModal.style.display = 'flex';
+    });
+
+    registerBtn.addEventListener('click', () => {
+      registerModal.style.display = 'flex';
+    });
+
+    switchToRegister.addEventListener('click', () => {
+      loginModal.style.display = 'none';
+      registerModal.style.display = 'flex';
+    });
+
+    switchToLogin.addEventListener('click', () => {
+      registerModal.style.display = 'none';
+      loginModal.style.display = 'flex';
+    });
+
+    // Close modals when clicking outside
+    window.addEventListener('click', (e) => {
+      if (e.target === loginModal) {
+        loginModal.style.display = 'none';
+      }
+      if (e.target === registerModal) {
+        registerModal.style.display = 'none';
+      }
+    });
+
+    // Login form submission
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      // Form validation
+      if (!email || !password) {
+        alert('Please fill in all fields');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('password', password);
+
+      fetch('login.php', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Store user info in session storage
+            sessionStorage.setItem('user_id', data.user_id);
+            sessionStorage.setItem('user_name', data.user_name);
+
+            // Close modal and update UI
+            loginModal.style.display = 'none';
+            loginForm.reset();
+            updateUIOnLogin(data.user_name);
+
+            // Refresh current view if needed
+            refreshCurrentView();
+            showHomeSection();
+          } else {
+            alert(data.message || 'Login failed. Please check your credentials.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred during login.');
+        });
+    });
+
+    // Register form submission
+    registerForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('register-name').value;
+      const email = document.getElementById('register-email').value;
+      const password = document.getElementById('register-password').value;
+
+      // Form validation
+      if (!name || !email || !password) {
+        alert('Please fill in all fields');
+        return;
+      }
+
+      if (password.length < 8) {
+        alert('Password must be at least 8 characters long');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('email', email);
+      formData.append('password', password);
+
+      fetch('register.php', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Store user info in session storage
+            sessionStorage.setItem('user_id', data.user_id);
+            sessionStorage.setItem('user_name', data.user_name);
+
+            // Close modal and update UI
+            registerModal.style.display = 'none';
+            registerForm.reset();
+            updateUIOnLogin(data.user_name);
+
+            alert('Registration successful! Welcome to DevOverflow.');
+          } else {
+            alert(data.message || 'Registration failed. Please try again.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred during registration.');
+        });
+    });
+
+    // Logout functionality
+    logoutBtn.addEventListener('click', function() {
+      fetch('logout.php')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Clear session storage
+            sessionStorage.removeItem('user_id');
+            sessionStorage.removeItem('user_name');
+
+            // Update UI
+            updateUIOnLogout();
+
+            // Redirect to homepage
+            showHomeSection();
+          } else {
+            alert(data.message || 'Logout failed. Please try again.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred during logout.');
+        });
+    });
+
+    // Function to check login status on page load
+    function checkLoginStatus() {
+      fetch('check_login.php')
+        .then(response => response.json())
+        .then(data => {
+          if (data.logged_in) {
+            // Store user info in session storage
+            sessionStorage.setItem('user_id', data.user_id);
+            sessionStorage.setItem('user_name', data.user_name);
+
+            // Update UI
+            updateUIOnLogin(data.user_name);
+          } else {
+            updateUIOnLogout();
+          }
+        })
+        .catch(error => {
+          console.error('Error checking login status:', error);
+        });
+    }
+
+    // Function to update UI when user logs in
+    function updateUIOnLogin(userName) {
+      authLinks.style.display = 'none';
+      userLinks.style.display = 'flex';
+      usernameDisplay.textContent = userName;
+
+      // Enable user-specific features
+      myQuestionsLink.style.display = 'flex';
+      myQuestionsLink.style.pointerEvents = 'auto';
+      myAnswersLink.style.display = 'flex';
+      myAnswersLink.style.pointerEvents = 'auto';
+    }
+
+    // Function to update UI when user logs out
+    function updateUIOnLogout() {
+      authLinks.style.display = 'flex';
+      userLinks.style.display = 'none';
+      usernameDisplay.textContent = '';
+
+      // Disable user-specific features
+      myQuestionsLink.style.display = 'none';
+      myQuestionsLink.style.pointerEvents = 'none';
+      myAnswersLink.style.display = 'none';
+      myAnswersLink.style.pointerEvents = 'none';
+    }
+
+    // Function to refresh current view based on active section
+    function refreshCurrentView() {
+      // Implement based on your application's structure
+      if (document.getElementById('my-questions-section').style.display !== 'none') {
+        // Refresh my questions
+        loadMyQuestions();
+      } else if (document.getElementById('my-answers-section').style.display !== 'none') {
+        // Refresh my answers
+        loadMyAnswers();
+      }
+    }
+
+    // Helper function to show home section
+    function showHomeSection() {
+      document.getElementById('home-section').style.display = 'block';
+      document.getElementById('question-detail-section').style.display = 'none';
+      document.getElementById('my-questions-section').style.display = 'none';
+      document.getElementById('my-answers-section').style.display = 'none';
+      document.getElementById('ask-question-section').style.display = 'none';
+
+      // Update active sidebar link
+      document.querySelectorAll('.sidebar-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      document.getElementById('questions-link').classList.add('active');
+    }
+
+    // These functions is a Placeholder while loading
+    function loadMyQuestions() {
+      // Placeholder for loading user questions
+      console.log('Loading my questions...');
+    }
+
+    function loadMyAnswers() {
+      // Placeholder for loading user answers
+      console.log('Loading my answers...');
+    }
+  });
+</script>
+<script>
+  // Question Management Scripts
+  document.addEventListener('DOMContentLoaded', function() {
+    // DOM elements
+    const homeSection = document.getElementById('home-section');
+    const questionDetailSection = document.getElementById('question-detail-section');
+    const myQuestionsSection = document.getElementById('my-questions-section');
+    const myAnswersSection = document.getElementById('my-answers-section');
+    const askQuestionSection = document.getElementById('ask-question-section');
+
+    // Question form elements
+    const questionForm = document.getElementById('question-form');
+    const questionFormTitle = document.getElementById('question-form-title');
+    const questionTitleInput = document.getElementById('question-title');
+    const questionBodyInput = document.getElementById('question-body');
+    const questionTagsInput = document.getElementById('question-tags');
+    const questionIdInput = document.getElementById('question-id');
+    const cancelQuestionBtn = document.getElementById('cancel-question-btn');
+
+    // Buttons that open the question form
+    const askQuestionBtn = document.getElementById('ask-question-btn');
+    const homeAskBtn = document.getElementById('home-ask-btn');
+    const myQuestionsAskBtn = document.getElementById('my-questions-ask-btn');
+
+    // Sidebar navigation links
+    const questionsLink = document.getElementById('questions-link');
+    const myQuestionsLink = document.getElementById('my-questions-link');
+    const myAnswersLink = document.getElementById('my-answers-link');
+    const homeLink = document.getElementById('home-link');
+
+    // Initialize the application
+    loadQuestions();
+
+    // Event listeners for navigation
+    homeLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      showHomeSection();
+      loadQuestions();
+    });
+
+    questionsLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      showHomeSection();
+      loadQuestions();
+    });
+
+    myQuestionsLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (isLoggedIn()) {
+        showMyQuestionsSection();
+        loadMyQuestions();
+      } else {
+        document.getElementById('login-modal').style.display = 'flex';
+      }
+    });
+
+    myAnswersLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (isLoggedIn()) {
+        showMyAnswersSection();
+        loadMyAnswers();
+      } else {
+        document.getElementById('login-modal').style.display = 'flex';
+      }
+    });
+
+    // Event listeners for Ask Question buttons
+    askQuestionBtn.addEventListener('click', showAskQuestionForm);
+    homeAskBtn.addEventListener('click', showAskQuestionForm);
+    myQuestionsAskBtn.addEventListener('click', showAskQuestionForm);
+
+    // Cancel button for question form
+    cancelQuestionBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      // Return to the previous section
+      const previousSection = sessionStorage.getItem('previousSection') || 'home';
+
+      if (previousSection === 'myQuestions') {
+        showMyQuestionsSection();
+        loadMyQuestions();
+      } else {
+        showHomeSection();
+        loadQuestions();
+      }
+    });
+
+    // Question form submission
+    questionForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      if (!isLoggedIn()) {
+        document.getElementById('login-modal').style.display = 'flex';
+        return;
+      }
+
+      // Validate form
+      if (!questionTitleInput.value.trim() || !questionBodyInput.value.trim()) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      // Prepare form data
+      const formData = new FormData();
+      formData.append('title', questionTitleInput.value.trim());
+      formData.append('body', questionBodyInput.value.trim());
+      formData.append('tags', questionTagsInput.value.trim());
+
+      // If we have a question ID, add it to the form data (for editing)
+      if (questionIdInput.value) {
+        formData.append('question_id', questionIdInput.value);
+      }
+
+      // Send request to the server
+      fetch('save_question.php', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            questionForm.reset();
+
+            // Redirect to appropriate section
+            if (questionIdInput.value) {
+              // After editing, go back to My Questions
+              showMyQuestionsSection();
+              loadMyQuestions();
+            } else {
+              // After adding new question, view the new question
+              loadQuestionDetail(data.question_id);
+            }
+          } else {
+            alert(data.message || 'Error saving question');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while saving the question');
+        });
+    });
+
+    // Load all questions
+    function loadQuestions() {
+      // Reset the page title
+      document.querySelector('#home-section .page-title h1').textContent = "All Questions";
+      document.getElementById('search-input').value = "";
+
+      const questionsList = document.getElementById('questions-list');
+      questionsList.innerHTML = '<p>Loading questions...</p>';
+
+      fetch('get_questions.php')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            displayQuestions(data.questions, questionsList);
+          } else {
+            questionsList.innerHTML = '<p>Error loading questions: ' + (data.message || 'Unknown error') + '</p>';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          questionsList.innerHTML = '<p>Error loading questions. Please try again later.</p>';
+        });
+    }
+
+    // Load user's questions
+    function loadMyQuestions() {
+      if (!isLoggedIn()) {
+        document.getElementById('login-modal').style.display = 'flex';
+        return;
+      }
+
+      const myQuestionsList = document.getElementById('my-questions-list');
+      myQuestionsList.innerHTML = '<p>Loading your questions...</p>';
+
+      fetch('get_my_questions.php')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            displayMyQuestions(data.questions, myQuestionsList);
+          } else {
+            myQuestionsList.innerHTML = '<p>Error loading your questions: ' + (data.message || 'Unknown error') + '</p>';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          myQuestionsList.innerHTML = '<p>Error loading your questions. Please try again later.</p>';
+        });
+    }
+
+    // Load user's answers
+    function loadMyAnswers() {
+      if (!isLoggedIn()) {
+        document.getElementById('login-modal').style.display = 'flex';
+        return;
+      }
+
+      const myAnswersList = document.getElementById('my-answers-list');
+      myAnswersList.innerHTML = '<p>Loading your answers...</p>';
+
+      fetch('get_my_answers.php')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            displayMyAnswers(data.answers, myAnswersList);
+          } else {
+            myAnswersList.innerHTML = '<p>Error loading your answers: ' + (data.message || 'Unknown error') + '</p>';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          myAnswersList.innerHTML = '<p>Error loading your answers. Please try again later.</p>';
+        });
+    }
+
+    // Load question detail
+    function loadQuestionDetail(questionId) {
+      const questionDetail = document.getElementById('question-detail');
+      const answersContainer = document.getElementById('answers-container');
+      const answerFormContainer = document.getElementById('answer-form-container');
+
+      questionDetail.innerHTML = '<p>Loading question...</p>';
+      answersContainer.innerHTML = '';
+      answerFormContainer.innerHTML = '';
+
+      fetch(`get_question.php?id=${questionId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            displayQuestionDetail(data.question, questionDetail);
+            displayAnswers(data.answers, answersContainer);
+
+            // Add answer form if user is logged in
+            if (isLoggedIn()) {
+              displayAnswerForm(questionId, answerFormContainer);
+            } else {
+              answerFormContainer.innerHTML = `
+            <div class="login-prompt">
+              <p>Please <a href="#" id="login-to-answer">log in</a> to answer this question.</p>
+            </div>
+          `;
+              document.getElementById('login-to-answer').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('login-modal').style.display = 'flex';
+              });
+            }
+
+            showQuestionDetailSection();
+          } else {
+            questionDetail.innerHTML = '<p>Error loading question: ' + (data.message || 'Unknown error') + '</p>';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          questionDetail.innerHTML = '<p>Error loading question. Please try again later.</p>';
+        });
+    }
+
+    // Display questions in the home section
+    function displayQuestions(questions, container) {
+      if (!questions || questions.length === 0) {
+        container.innerHTML = '<p>No questions found.</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+
+      questions.forEach(question => {
+        const questionElement = document.createElement('div');
+        questionElement.className = 'question-summary';
+        questionElement.innerHTML = `
+        <h3 class="question-title"><a href="#" data-question-id="${question.id}">${escapeHTML(question.title)}</a></h3>
+        <div class="question-excerpt">${escapeHTML(question.body).substring(0, 200)}${question.body.length > 200 ? '...' : ''}</div>
+        <div class="question-meta">
+          <div class="tags">${displayTags(question.tags)}</div>
+          <div class="user-info">
+            asked ${formatDate(question.created_at)} by ${escapeHTML(question.user_name)}
+          </div>
+        </div>
+        <div class="question-stats">
+          <div class="stat">
+            <div class="stat-number">${question.answers_count || 0}</div>
+            <div class="stat-text">answers</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">${question.views || 0}</div>
+            <div class="stat-text">views</div>
+          </div>
+        </div>
+      `;
+
+        // Add event listener to question title
+        const questionLink = questionElement.querySelector('.question-title a');
+        questionLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          const questionId = this.getAttribute('data-question-id');
+          loadQuestionDetail(questionId);
+        });
+
+        container.appendChild(questionElement);
+      });
+    }
+
+    // Display user's questions in the My Questions section
+    function displayMyQuestions(questions, container) {
+      if (!questions || questions.length === 0) {
+        container.innerHTML = '<p>You haven\'t asked any questions yet.</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+
+      questions.forEach(question => {
+        const questionElement = document.createElement('div');
+        questionElement.className = 'question-summary';
+        questionElement.innerHTML = `
+        <h3 class="question-title"><a href="#" data-question-id="${question.id}">${escapeHTML(question.title)}</a></h3>
+        <div class="question-excerpt">${escapeHTML(question.body).substring(0, 200)}${question.body.length > 200 ? '...' : ''}</div>
+        <div class="question-meta">
+          <div class="tags">${displayTags(question.tags)}</div>
+          <div class="user-info">
+            asked ${formatDate(question.created_at)}
+            <button class="btn-secondary edit-question-btn" data-question-id="${question.id}">Edit</button>
+          </div>
+        </div>
+        <div class="question-stats">
+          <div class="stat">
+            <div class="stat-number">${question.answers_count || 0}</div>
+            <div class="stat-text">answers</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">${question.views || 0}</div>
+            <div class="stat-text">views</div>
+          </div>
+        </div>
+      `;
+
+        container.appendChild(questionElement);
+      });
+
+      // Add event listeners to question titles and edit buttons
+      container.querySelectorAll('.question-title a').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const questionId = this.getAttribute('data-question-id');
+          loadQuestionDetail(questionId);
+        });
+      });
+
+      container.querySelectorAll('.edit-question-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          const questionId = this.getAttribute('data-question-id');
+          loadQuestionForEdit(questionId);
+        });
+      });
+    }
+
+    // Display answer form
+    function displayAnswerForm(questionId, container) {
+      container.innerHTML = `
+    <h3>Your Answer</h3>
+    <form id="answer-form">
+      <div class="form-group">
+        <textarea id="answer-body" rows="8" required placeholder="Write your answer here..."></textarea>
+      </div>
+      <input type="hidden" id="answer-question-id" value="${questionId}">
+      <input type="hidden" id="answer-id" value="">
+      <button type="submit" class="btn">Post Your Answer</button>
+    </form>
+  `;
+
+      // Add event listener to form
+      document.getElementById('answer-form').addEventListener('submit', handleAnswerSubmit);
+    }
+
+// Handle answer form submission
+    function handleAnswerSubmit(e) {
+      e.preventDefault();
+
+      const answerBody = document.getElementById('answer-body').value;
+      const questionId = document.getElementById('answer-question-id').value;
+      const answerId = document.getElementById('answer-id').value;
+
+      if (!answerBody.trim()) {
+        alert('Please write an answer before submitting');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('body', answerBody);
+      formData.append('question_id', questionId);
+
+      if (answerId) {
+        formData.append('answer_id', answerId);
+      }
+
+      fetch('answer_handler.php', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            document.getElementById('answer-form').reset();
+            document.getElementById('answer-id').value = '';
+
+            // Reload the question to show the new/edited answer
+            loadQuestionDetail(questionId);
+          } else {
+            alert(data.message || 'Error saving answer');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while saving your answer');
+        });
+    }
+
+// Modify the displayAnswers function to add edit functionality
+    function displayAnswers(answers, container) {
+      container.innerHTML = `<h2 class="answers-header">${answers.length} Answer${answers.length !== 1 ? 's' : ''}</h2>`;
+
+      answers.forEach(answer => {
+        const answerElement = document.createElement('div');
+        answerElement.className = 'answer';
+        answerElement.innerHTML = `
+      <div style="display: flex;">
+        <!-- Vote controls -->
+        <div class="vote-controls">
+          <button class="vote-button upvote" data-answer-id="${answer.id}" data-vote-type="up">▲</button>
+          <div class="vote-count" id="vote-count-${answer.id}">${answer.votes || 0}</div>
+          <button class="vote-button downvote" data-answer-id="${answer.id}" data-vote-type="down">▼</button>
+        </div>
+
+        <div style="flex-grow: 1;">
+          <div class="answer-body">${escapeHTML(answer.body)}</div>
+          <div class="answer-meta">
+            <span>Answered by ${escapeHTML(answer.user_name)}</span>
+            <span>${formatDate(answer.created_at)}</span>
+          </div>
+          ${isCurrentUser(answer.user_id) ?
+          `<div class="answer-actions">
+              <button class="btn-secondary edit-answer-btn" data-answer-id="${answer.id}">Edit</button>
+            </div>` : ''}
+        </div>
+      </div>
+
+      <!-- Comments section for this answer -->
+      <div class="comments">
+        <h3>Comments</h3>
+        <div id="answer-${answer.id}-comments" class="comments-list">
+          <p>Loading comments...</p>
+        </div>
+        <div class="add-comment">
+          <button class="btn-secondary add-comment-btn" onclick="showAddCommentModal(${answer.id}, 'answer')">Add a comment</button>
+        </div>
+      </div>
+    `;
+
+        container.appendChild(answerElement);
+
+        // Load comments for this answer
+        loadComments(answer.id, 'answer');
+
+        // Check if the user has already voted on this answer
+        if (isLoggedIn()) {
+          checkUserRating(answer.id);
+        }
+      });
+
+      // Add event listeners for edit buttons
+      container.querySelectorAll('.edit-answer-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          const answerId = this.getAttribute('data-answer-id');
+          loadAnswerForEdit(answerId);
+        });
+      });
+
+      // Add event listeners for vote buttons
+      container.querySelectorAll('.vote-button').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (!isLoggedIn()) {
+            // Show login modal if user is not logged in
+            document.getElementById('login-modal').style.display = 'flex';
+            return;
+          }
+
+          const answerId = this.getAttribute('data-answer-id');
+          const voteType = this.getAttribute('data-vote-type');
+          rateAnswer(answerId, voteType);
+        });
+      });
+    }
+
+// Function to check if user has already rated an answer
+    function checkUserRating(answerId) {
+      fetch(`rating_handler.php?answer_id=${answerId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.has_rating) {
+            // Highlight the button that matches the user's rating
+            const voteType = data.rating_type;
+            const button = document.querySelector(`.vote-button[data-answer-id="${answerId}"][data-vote-type="${voteType}"]`);
+            if (button) {
+              button.classList.add('active');
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error checking user rating:', error);
+        });
+    }
+
+// Function to handle answer rating
+    function rateAnswer(answerId, ratingType) {
+      const formData = new FormData();
+      formData.append('answer_id', answerId);
+      formData.append('rating_type', ratingType);
+
+      fetch('rating_handler.php', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Update the vote count in the UI
+            const voteCountElement = document.getElementById(`vote-count-${answerId}`);
+            if (voteCountElement) {
+              voteCountElement.textContent = data.votes;
+            }
+
+            // Reset active classes on vote buttons
+            const upvoteButton = document.querySelector(`.vote-button.upvote[data-answer-id="${answerId}"]`);
+            const downvoteButton = document.querySelector(`.vote-button.downvote[data-answer-id="${answerId}"]`);
+
+            if (upvoteButton) upvoteButton.classList.remove('active');
+            if (downvoteButton) downvoteButton.classList.remove('active');
+
+            // Add active class to current rating if there is one
+            if (data.current_rating) {
+              const activeButton = document.querySelector(`.vote-button[data-answer-id="${answerId}"][data-vote-type="${data.current_rating}"]`);
+              if (activeButton) {
+                activeButton.classList.add('active');
+              }
+            }
+          } else {
+            alert(data.message || 'Error rating answer');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while rating the answer');
+        });
+    }
+
+    // Load answer data for editing
+    function loadAnswerForEdit(answerId) {
+      fetch(`answer_handler.php?answer_id=${answerId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // تعبئة حقول المودال
+            document.getElementById('edit-answer-body').value = data.answer.body;
+            document.getElementById('edit-answer-id').value = data.answer.id;
+            document.getElementById('edit-answer-question-id').value = data.answer.question_id;
+
+            // فتح المودال
+            document.getElementById('edit-answer-modal').style.display = 'flex';
+          } else {
+            alert(data.message || 'Error loading answer');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Failed to load answer for editing');
+        });
+    }
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(e) {
+      editAnswerModal = document.getElementById("edit-answer-modal")
+      if (e.target === editAnswerModal) {
+        editAnswerModal.style.display = 'none';
+      }
+    });
+// Update the handlers for edit answer buttons in the My Answers section
+    function displayMyAnswers(answers, container) {
+      if (!answers || answers.length === 0) {
+        container.innerHTML = '<p>You haven\'t answered any questions yet.</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+
+      answers.forEach(answer => {
+        const answerElement = document.createElement('div');
+        answerElement.className = 'my-answer-item';
+        answerElement.innerHTML = `
+      <div class="answer-content">
+        <h3><a href="#" class="question-link" data-question-id="${answer.question_id}">${escapeHTML(answer.question_title)}</a></h3>
+        <div class="answer-body">${escapeHTML(answer.body).substring(0, 200)}${answer.body.length > 200 ? '...' : ''}</div>
+        <div class="answer-meta">
+          <span>Posted: ${formatDate(answer.created_at)}</span>
+          <span>Votes: ${answer.votes || 0}</span>
+          <button class="edit-answer-btn" data-answer-id="${answer.id}" data-question-id="${answer.question_id}">Edit Answer</button>
+        </div>
+      </div>
+    `;
+        container.appendChild(answerElement);
+      });
+
+      // Add event listeners to question links and edit buttons
+      container.querySelectorAll('.question-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const questionId = this.getAttribute('data-question-id');
+          loadQuestionDetail(questionId);
+        });
+      });
+
+      container.querySelectorAll('.edit-answer-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          const answerId = this.getAttribute('data-answer-id');
+          const questionId = this.getAttribute('data-question-id');
+
+          // Load the question and then the answer for editing
+          loadQuestionDetail(questionId);
+
+          // Wait a bit for the question to load before loading the answer
+          setTimeout(() => {
+            loadAnswerForEdit(answerId, questionId);
+          }, 500);
+        });
+      });
+    }
+
+
+    // Display question detail
+    function displayQuestionDetail(question, container) {
+      container.innerHTML = `
+    <div class="question-header">
+      <h1>${escapeHTML(question.title)}</h1>
+      <div class="question-meta">
+        <span>Asked: ${formatDate(question.created_at)}</span>
+        ${question.updated_at ? `<span>Updated: ${formatDate(question.updated_at)}</span>` : ''}
+        <span>Views: ${question.views}</span>
+      </div>
+    </div>
+    <div class="question-body">${escapeHTML(question.body)}</div>
+    <div class="tags">${displayTags(question.tags)}</div>
+    <div class="question-author">
+      <p>Asked by: ${escapeHTML(question.user_name)}</p>
+    </div>
+
+    <!-- Comments section for question -->
+    <div class="comments">
+      <h3>Comments</h3>
+      <div id="question-${question.id}-comments" class="comments-list">
+        <p>Loading comments...</p>
+      </div>
+      <div class="add-comment">
+        <button class="btn add-comment-btn" onclick="showAddCommentModal(${question.id}, 'question')">Add a comment</button>
+      </div>
+    </div>
+  `;
+
+      // Load comments for this question
+      loadComments(question.id, 'question');
+    }
+
+
+    // Load question data for editing
+    function loadQuestionForEdit(questionId) {
+      fetch(`get_question.php?id=${questionId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const question = data.question;
+
+            // Make sure the current user is the author
+            if (!isCurrentUser(question.user_id)) {
+              alert('You can only edit your own questions');
+              return;
+            }
+
+            // Set the form fields
+            questionTitleInput.value = question.title;
+            questionBodyInput.value = question.body;
+            questionIdInput.value = question.id;
+
+            // Set tags
+            if (question.tags && question.tags.length > 0) {
+              questionTagsInput.value = question.tags.map(tag => tag.name).join(', ');
+            } else {
+              questionTagsInput.value = '';
+            }
+
+            // Update form title and show the form
+            questionFormTitle.textContent = 'Edit Your Question';
+            showAskQuestionSection();
+
+            // Store the previous section
+            sessionStorage.setItem('previousSection', 'myQuestions');
+          } else {
+            alert(data.message || 'Error loading question for editing');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while loading the question for editing');
+        });
+    }
+
+    // Show Ask Question form
+    function showAskQuestionForm() {
+      if (!isLoggedIn()) {
+        document.getElementById('login-modal').style.display = 'flex';
+        return;
+      }
+
+      // Reset form for new question
+      questionForm.reset();
+      questionIdInput.value = '';
+      questionFormTitle.textContent = 'Ask a Question';
+
+      // Store current section before switching
+      if (myQuestionsSection.style.display !== 'none') {
+        sessionStorage.setItem('previousSection', 'myQuestions');
+      } else {
+        sessionStorage.setItem('previousSection', 'home');
+      }
+
+      showAskQuestionSection();
+    }
+
+    // Helper function to format date
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffTime = Math.abs(now - date);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) {
+        return 'today';
+      } else if (diffDays === 1) {
+        return 'yesterday';
+      } else if (diffDays < 7) {
+        return `${diffDays} days ago`;
+      } else {
+        return date.toLocaleDateString();
+      }
+    }
+
+    // Helper function to display tags
+    function displayTags(tags) {
+      if (!tags || tags.length === 0) {
+        return '';
+      }
+
+      return tags.map(tag => `<span class="tag">${escapeHTML(tag.name)}</span>`).join('');
+    }
+
+    // Helper function to escape HTML
+    function escapeHTML(str) {
+      if (!str) return '';
+
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Helper function to check if user is logged in
+    function isLoggedIn() {
+      return sessionStorage.getItem('user_id') !== null;
+    }
+
+    // Helper function to check if given user ID matches the current user
+    function isCurrentUser(userId) {
+      return isLoggedIn() && sessionStorage.getItem('user_id') == userId;
+    }
+
+    // Section display functions
+    function showHomeSection() {
+      homeSection.style.display = 'block';
+      questionDetailSection.style.display = 'none';
+      myQuestionsSection.style.display = 'none';
+      myAnswersSection.style.display = 'none';
+      askQuestionSection.style.display = 'none';
+
+      updateActiveSidebarLink('questions-link');
+    }
+
+    function showQuestionDetailSection() {
+      homeSection.style.display = 'none';
+      questionDetailSection.style.display = 'block';
+      myQuestionsSection.style.display = 'none';
+      myAnswersSection.style.display = 'none';
+      askQuestionSection.style.display = 'none';
+    }
+
+    function showMyQuestionsSection() {
+      homeSection.style.display = 'none';
+      questionDetailSection.style.display = 'none';
+      myQuestionsSection.style.display = 'block';
+      myAnswersSection.style.display = 'none';
+      askQuestionSection.style.display = 'none';
+
+      updateActiveSidebarLink('my-questions-link');
+    }
+
+    function showMyAnswersSection() {
+      homeSection.style.display = 'none';
+      questionDetailSection.style.display = 'none';
+      myQuestionsSection.style.display = 'none';
+      myAnswersSection.style.display = 'block';
+      askQuestionSection.style.display = 'none';
+
+      updateActiveSidebarLink('my-answers-link');
+    }
+
+    function showAskQuestionSection() {
+      homeSection.style.display = 'none';
+      questionDetailSection.style.display = 'none';
+      myQuestionsSection.style.display = 'none';
+      myAnswersSection.style.display = 'none';
+      askQuestionSection.style.display = 'block';
+    }
+
+    // Helper function to update active sidebar link
+    function updateActiveSidebarLink(linkId) {
+      document.querySelectorAll('.sidebar-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      document.getElementById(linkId).classList.add('active');
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-answer-modal').style.display = 'none';
+    }
+
+
+// معالجة إرسال النموذج
+    document.getElementById('edit-answer-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append('answer_id', document.getElementById('edit-answer-id').value);
+      formData.append('body', document.getElementById('edit-answer-body').value);
+      formData.append('question_id', document.getElementById('edit-answer-question-id').value);
+
+      fetch('answer_handler.php', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            closeEditModal();
+            // تحديث الإجابة في الواجهة
+            const answerElement = document.querySelector(`[data-answer-id="${data.answer_id}"]`);
+            if (answerElement) {
+              answerElement.querySelector('.answer-body').innerHTML = escapeHTML(data.answer.body);
+            }
+          } else {
+            alert(data.message || 'Error updating answer');
+          }
+        })
+      alert("Answer edited successfully");
+      showHomeSection()
+    });
+
+
+    // Add comment modal elements
+    const addCommentModal = document.getElementById('add-comment-modal');
+    const closeAddCommentModal = document.getElementById('close-add-comment-modal');
+    const cancelAddComment = document.getElementById('cancel-add-comment');
+    const addCommentForm = document.getElementById('add-comment-form');
+    const commentBody = document.getElementById('comment-body');
+    const commentId = document.getElementById('comment-id');
+    const commentParentId = document.getElementById('comment-parent-id');
+    const commentParentType = document.getElementById('comment-parent-type');
+    const commentCharsLeft = document.getElementById('comment-chars-left');
+
+
+    // Close comment modal events
+    if (closeAddCommentModal) {
+      closeAddCommentModal.addEventListener('click', function() {
+        addCommentModal.style.display = 'none';
+      });
+    }
+
+    if (cancelAddComment) {
+      cancelAddComment.addEventListener('click', function() {
+        addCommentModal.style.display = 'none';
+      });
+    }
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(e) {
+      if (e.target === addCommentModal) {
+        addCommentModal.style.display = 'none';
+      }
+    });
+
+    // Comment form submission
+    addCommentForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      if (!isLoggedIn()) {
+        document.getElementById('login-modal').style.display = 'flex';
+        return;
+      }
+
+      const body = commentBody.value.trim();
+      const parentId = commentParentId.value;
+      const parentType = commentParentType.value;
+      const editCommentId = commentId.value;
+
+      if (!body) {
+        alert('Comment body cannot be empty.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('body', body);
+      formData.append('parent_id', parentId);
+      formData.append('parent_type', parentType);
+
+      if (editCommentId) {
+        formData.append('comment_id', editCommentId);
+      }
+
+      fetch('comment_handler.php', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Close the modal and reset form
+            addCommentModal.style.display = 'none';
+            addCommentForm.reset();
+            commentId.value = '';
+
+            // Refresh comments for the parent
+            loadComments(parentId, parentType);
+
+            // Alert on success
+            alert(data.message);
+          } else {
+            alert(data.message || 'Error saving comment');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while saving your comment');
+        });
+    });
+
+    // Function to show add comment modal
+    window.showAddCommentModal = function(parentId, parentType, commentIdToEdit = null) {
+      if (!isLoggedIn()) {
+        document.getElementById('login-modal').style.display = 'flex';
+        return;
+      }
+
+      // Reset the form
+      addCommentForm.reset();
+      commentCharsLeft.textContent = '500';
+
+      // Set parent info
+      commentParentId.value = parentId;
+      commentParentType.value = parentType;
+
+      // Check if we're editing an existing comment
+      if (commentIdToEdit) {
+        // Load comment data for editing
+        fetch(`comment_handler.php?comment_id=${commentIdToEdit}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              commentBody.value = data.comment.body;
+              commentId.value = data.comment.id;
+              // Update character counter
+              const maxLength = parseInt(commentBody.getAttribute('maxlength'));
+              commentCharsLeft.textContent = maxLength - commentBody.value.length;
+              // Show modal
+              addCommentModal.style.display = 'flex';
+            } else {
+              alert(data.message || 'Error loading comment');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to load comment for editing');
+          });
+      } else {
+        // New comment
+        commentId.value = '';
+        addCommentModal.style.display = 'flex';
+      }
+    };
+
+    // Function to load comments for a parent (question or answer)
+    window.loadComments = function(parentId, parentType) {
+      fetch(`comment_handler.php?parent_id=${parentId}&parent_type=${parentType}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Find the comments container for this parent
+            const commentsContainerId = `${parentType}-${parentId}-comments`;
+            const commentsContainer = document.getElementById(commentsContainerId);
+
+            if (commentsContainer) {
+              displayComments(data.comments, commentsContainer, parentId, parentType);
+            }
+          } else {
+            console.error('Error loading comments:', data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    };
+
+    // Function to display comments
+    function displayComments(comments, container, parentId, parentType) {
+      if (!comments || comments.length === 0) {
+        container.innerHTML = '<p class="no-comments">No comments yet.</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+
+      comments.forEach(comment => {
+        const commentElement = document.createElement('div');
+        commentElement.className = 'comment';
+        commentElement.innerHTML = `
+        <div class="comment-body">${escapeHTML(comment.body)}</div>
+        <div class="comment-meta">
+          <span>${escapeHTML(comment.user_name)} - ${formatDate(comment.created_at)}</span>
+          ${isCurrentUser(comment.user_id) ?
+          `<button class="btn-link edit-comment-btn" data-comment-id="${comment.id}">Edit</button>` : ''}
+        </div>
+      `;
+        container.appendChild(commentElement);
+      });
+
+      // Add event listeners for edit buttons
+      container.querySelectorAll('.edit-comment-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          const commentId = this.getAttribute('data-comment-id');
+          showAddCommentModal(parentId, parentType, commentId);
+        });
+      });
+    }
+
+    // This is a reference to what should be modified in the existing function
+    window.originalDisplayQuestionDetail = window.displayQuestionDetail;
+    window.displayQuestionDetail = function(question, container) {
+      // Call the original function first
+      if (window.originalDisplayQuestionDetail) {
+        window.originalDisplayQuestionDetail(question, container);
+      } else {
+        // Fallback if original function isn't available
+        container.innerHTML = `
+        <div class="question-header">
+          <h1>${escapeHTML(question.title)}</h1>
+          <div class="question-meta">
+            <span>Asked: ${formatDate(question.created_at)}</span>
+            ${question.updated_at ? `<span>Updated: ${formatDate(question.updated_at)}</span>` : ''}
+            <span>Views: ${question.views}</span>
+          </div>
+        </div>
+        <div class="question-body">${escapeHTML(question.body)}</div>
+        <div class="tags">${question.tags && question.tags.map ? question.tags.map(tag => `<span class="tag">${escapeHTML(tag.name)}</span>`).join('') : ''}</div>
+        <div class="question-author">
+          <p>Asked by: ${escapeHTML(question.user_name)}</p>
+        </div>
+      `;
+      }
+
+      // Add comments section for the question
+      container.innerHTML += `
+      <div class="comments">
+        <h3>Comments</h3>
+        <div id="question-${question.id}-comments" class="comments-list">
+          <p>Loading comments...</p>
+        </div>
+        <div class="add-comment">
+          <button class="btn-secondary add-comment-btn" onclick="showAddCommentModal(${question.id}, 'question')">Add a comment</button>
+        </div>
+      </div>
+    `;
+
+      // Load comments for this question
+      loadComments(question.id, 'question');
+    };
+
+    // Update the original displayAnswers function to include comments
+    // This is a reference to what should be modified in the existing function
+    window.originalDisplayAnswers = window.displayAnswers;
+    window.displayAnswers = function(answers, container) {
+      // Call the original function first or recreate basic functionality
+      if (window.originalDisplayAnswers) {
+        window.originalDisplayAnswers(answers, container);
+      } else {
+        container.innerHTML = `<h2 class="answers-header">${answers.length} Answer${answers.length !== 1 ? 's' : ''}</h2>`;
+
+        answers.forEach(answer => {
+          const answerElement = document.createElement('div');
+          answerElement.className = 'answer';
+          answerElement.innerHTML = `
+          <div class="answer-body">${escapeHTML(answer.body)}</div>
+          <div class="answer-meta">
+            <span>Answered by ${escapeHTML(answer.user_name)}</span>
+            <span>${formatDate(answer.created_at)}</span>
+          </div>
+          ${isCurrentUser(answer.user_id) ?
+            `<button class="btn-secondary edit-answer-btn" data-answer-id="${answer.id}">Edit</button>` : ''}
+        `;
+          container.appendChild(answerElement);
+        });
+      }
+
+      // Now add comments to each answer
+      const answerElements = container.querySelectorAll('.answer');
+      answers.forEach((answer, index) => {
+        if (index < answerElements.length) {
+          const answerElement = answerElements[index];
+
+          // Add comments section for this answer
+          const commentsSection = document.createElement('div');
+          commentsSection.className = 'comments';
+          commentsSection.innerHTML = `
+          <h3>Comments</h3>
+          <div id="answer-${answer.id}-comments" class="comments-list">
+            <p>Loading comments...</p>
+          </div>
+          <div class="add-comment">
+            <button class="btn-secondary add-comment-btn" onclick="showAddCommentModal(${answer.id}, 'answer')">Add a comment</button>
+          </div>
+        `;
+          answerElement.appendChild(commentsSection);
+
+          // Load comments for this answer
+          loadComments(answer.id, 'answer');
+        }
+      });
+    };
+
+    // Search functionality implementation
+      // Get search elements
+      const searchInput = document.getElementById('search-input');
+      const searchBtn = document.getElementById('search-btn');
+
+      // Add event listener for search button
+      searchBtn.addEventListener('click', function() {
+        performSearch();
+      });
+
+      // Add event listener for Enter key in search input
+      searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          performSearch();
+        }
+      });
+
+      // Function to perform search
+      function performSearch() {
+        const searchQuery = searchInput.value.trim();
+
+        if (!searchQuery) {
+          alert('Please enter a search term');
+          return;
+        }
+
+        // Clear previous questions and show loading message
+        const questionsContainer = document.getElementById('questions-list');
+        questionsContainer.innerHTML = '<p>Searching...</p>';
+
+        // Update page title to show we're searching
+        document.querySelector('#home-section .page-title h1').textContent = `Search Results for "${searchQuery}"`;
+
+        // Show home section (which will display results)
+        showHomeSection();
+
+        // Make search request
+        fetch(`search_handler.php?query=${encodeURIComponent(searchQuery)}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              displaySearchResults(data.results, data.query, questionsContainer);
+            } else {
+              questionsContainer.innerHTML = `<p>Error: ${data.message}</p>`;
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            questionsContainer.innerHTML = '<p>An error occurred while searching. Please try again.</p>';
+          });
+      }
+
+      // Function to display search results
+      function displaySearchResults(results, query, container) {
+        if (!results || results.length === 0) {
+          container.innerHTML = `<p>No results found for "${escapeHTML(query)}"</p>`;
+          return;
+        }
+
+        // Show result count at the top
+        container.innerHTML = `<p>${results.length} result${results.length !== 1 ? 's' : ''} found for "${escapeHTML(query)}"</p>`;
+
+        // Create and append each result
+        results.forEach(question => {
+          const questionElement = document.createElement('div');
+          questionElement.className = 'question-summary';
+
+          // Highlight the search term in title and body preview
+          const highlightedTitle = highlightSearchTerm(question.title, query);
+          const highlightedBody = highlightSearchTerm(question.body_preview || question.body.substring(0, 200), query);
+
+          questionElement.innerHTML = `
+        <h3 class="question-title"><a href="#" data-question-id="${question.id}">${highlightedTitle}</a></h3>
+        <div class="question-excerpt">${highlightedBody}</div>
+        <div class="question-meta">
+          <div class="tags">${displayTags(question.tags)}</div>
+          <div class="user-info">
+            asked ${formatDate(question.created_at)} by ${escapeHTML(question.user_name)}
+          </div>
+        </div>
+        <div class="question-stats">
+          <div class="stat">
+            <div class="stat-number">${question.answers_count || 0}</div>
+            <div class="stat-text">answers</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">${question.views || 0}</div>
+            <div class="stat-text">views</div>
+          </div>
+        </div>
+      `;
+
+          container.appendChild(questionElement);
+
+          // Add event listener to question title
+          const questionLink = questionElement.querySelector('.question-title a');
+          questionLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            const questionId = this.getAttribute('data-question-id');
+            loadQuestionDetail(questionId);
+          });
+        });
+      }
+
+      // Function to highlight search terms in text
+      function highlightSearchTerm(text, query) {
+        if (!text || !query) return text;
+
+        // Escape HTML to prevent XSS
+        const escapedText = escapeHTML(text);
+
+        // Create RegExp for case-insensitive search
+        // Escape special characters in the query to avoid RegExp errors
+        const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp('(' + escapedQuery + ')', 'gi');
+
+        // Replace matches with highlighted version
+        return escapedText.replace(regex, '<span style="background-color: #ffeb3b; font-weight: bold;">$1</span>');
+      }
+
+    // Reset the page title to "All Questions" when returning to home
+    document.querySelector('#home-section .page-title h1').textContent = "All Questions";
+  });
+
+  document.getElementById('home-link').addEventListener('click', function(e) {
+    // Also reset when clicking the logo/home link
+    document.querySelector('#home-section .page-title h1').textContent = "All Questions";
+
+  });
+  document.addEventListener('click', function(e) {
+    if (e.target.matches('.question-title a')) {
+      e.preventDefault();
+      const questionId = e.target.dataset.questionId;
+      loadQuestionDetail(questionId);
+    }
+  });
+  function closeEditModal() {
+    document.getElementById('edit-answer-modal').style.display = 'none';
+  }
+
+</script>
+</body>
+</html>
